@@ -102,7 +102,7 @@ public class VentanaLogin extends JFrame {
         JPasswordField txtClave = new JPasswordField();
         txtClave.setBounds(50, 90, 200, 25);
         recuadroLogin.add(txtClave);
-
+        
         JButton btnEntrar = new JButton("Iniciar sesión");
         btnEntrar.setBounds(50, 120, 200, 30);
         btnEntrar.setBackground(new Color(255, 240, 0));
@@ -110,14 +110,23 @@ public class VentanaLogin extends JFrame {
         btnEntrar.setFont(new Font("Arial", Font.BOLD, 13));
         recuadroLogin.add(btnEntrar);
 
-        // Acción del botón
+        // --- AQUÍ ESTÁ EL CAMBIO ---
         btnEntrar.addActionListener(e -> {
-            String clave = new String(txtClave.getPassword());
-            if (clave.equals("1234")) {
-                new VentanaPrincipal(); // 🔹 Llama a la otra clase
-                dispose(); // Cierra esta ventana
-            } else {
-                JOptionPane.showMessageDialog(this, "Clave incorrecta");
+            String usuario = txtUsuario.getText(); // Capturamos el usuario
+            String clave = new String(txtClave.getPassword()); // Capturamos la clave
+
+            // Condición para admin/admin
+            if (usuario.equals("admin") && clave.equals("admin")) {
+                new VentanaPrincipal(); // Abre la ventana principal
+                dispose(); // Cierra el login
+            } 
+            // Opción extra: dejar la clave 1234 por si acaso (opcional)
+            else if (clave.equals("1234")) {
+                 new VentanaPrincipal();
+                 dispose();
+            }
+            else {
+                JOptionPane.showMessageDialog(this, "Usuario o clave incorrecta", "Error de Acceso", JOptionPane.ERROR_MESSAGE);
             }
         });
     }
