@@ -1,3 +1,4 @@
+/*
 package sia;
 
 import java.util.Scanner; 
@@ -51,3 +52,4 @@ public class Estudiante {
         scanner.close();
     }
 }
+*/
