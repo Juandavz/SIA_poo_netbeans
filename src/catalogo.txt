@@ -1,0 +1,43 @@
+========================================
+Codigo: 1000001
+Asignatura: Cálculo Diferencial
+Facultad: Ciencias
+Creditos: 4
+Cupos: 45
+========================================
+Codigo: 1000002
+Asignatura: Cálculo Integral
+Facultad: Ciencias
+Creditos: 4
+Cupos: 40
+========================================
+Codigo: 2001562
+Asignatura: Programación Orientada a Objetos
+Facultad: Ingeniería
+Creditos: 3
+Cupos: 30
+========================================
+Codigo: 2001563
+Asignatura: Estructuras de Datos
+Facultad: Ingeniería
+Creditos: 3
+Cupos: 25
+========================================
+Codigo: 3005210
+Asignatura: Historia de Colombia
+Facultad: Ciencias Humanas
+Creditos: 3
+Cupos: 100
+========================================
+Codigo: 1000045
+Asignatura: Física Mecánica
+Facultad: Ciencias
+Creditos: 4
+Cupos: 60
+========================================
+Codigo: 4000101
+Asignatura: Inteligencia Artificial
+Facultad: Ingeniería
+Creditos: 3
+Cupos: 20
+========================================

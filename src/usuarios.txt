@@ -1,0 +1,26 @@
+========================================
+Usuario: admin
+Clave: admin
+Nombre: Administrador (Soporte)
+Rol: admin
+========================================
+Usuario: pepito
+Clave: 1234
+Nombre: Pepito Pérez (Novato)
+Rol: estudiante
+========================================
+Usuario: maria
+Clave: 0000
+Nombre: María González (Promedio)
+Rol: estudiante
+========================================
+Usuario: carlos
+Clave: 1111
+Nombre: Carlos "El Vago" Rodríguez
+Rol: estudiante
+========================================
+Usuario: ana
+Clave: 2222
+Nombre: Ana "La Genio" Martínez
+Rol: estudiante
+========================================
