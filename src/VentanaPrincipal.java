@@ -29,6 +29,7 @@ public class VentanaPrincipal extends JFrame {
     private CardLayout cardLayout;
     private String usuarioActual;
     private JLabel lblRuta;
+    
 
     public VentanaPrincipal(String usuario) {
         this.usuarioActual = usuario;
@@ -68,7 +69,7 @@ public class VentanaPrincipal extends JFrame {
         panelContenido.add(crearPanelHistoria(), "HISTORIA");
         panelContenido.add(crearPanelHorario(), "HORARIO");
         panelContenido.add(crearPanelDatos(), "DATOS");
-        panelContenido.add(crearPanelBuscador(), "BUSCADOR");
+        panelContenido.add(new PanelBuscador(), "BUSCADOR");
 
         centroWrapper.add(panelContenido, BorderLayout.CENTER);
         add(centroWrapper, BorderLayout.CENTER);
@@ -349,76 +350,7 @@ public class VentanaPrincipal extends JFrame {
         p.add(new JScrollPane(t), BorderLayout.CENTER);
         return p;
     }
-
-    // --- 4. BUSCADOR (COMPLETO CON FORMULARIO Y TABLA) ---
-    private JPanel crearPanelBuscador() {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBackground(Color.WHITE);
-        p.setBorder(new EmptyBorder(20, 20, 20, 20));
-        
-        // Formulario Gris
-        JPanel form = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
-        form.setBackground(new Color(240, 240, 240));
-        form.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Criterios", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, new Font("Verdana", Font.BOLD, 11)));
-        
-        JTextField txt = new JTextField(20);
-        JButton btn = new JButton("Buscar");
-        btn.setBackground(new Color(220, 220, 220));
-        form.add(new JLabel("Palabra Clave: ")); form.add(txt); form.add(btn);
-        p.add(form, BorderLayout.NORTH);
-        
-        // Tabla Resultados
-        String[] cols = {"Código", "Asignatura", "Facultad", "Créditos", "Cupos"};
-        Object[][] data = DataManager.cargarCatalogo(); // Carga desde TXT
-        
-        DefaultTableModel model = new DefaultTableModel(data, cols) {
-            public boolean isCellEditable(int r, int c) { return false; }
-        };
-        JTable t = new JTable(model);
-        diseñarEstiloTabla(t); // Aplica estilo Ocre
-        
-        t.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) { // Doble clic
-                    int filaSeleccionada = t.getSelectedRow();
-                    if (filaSeleccionada != -1) {
-                        // Convertimos el índice de la vista al del modelo (por si filtraste)
-                        int filaModelo = t.convertRowIndexToModel(filaSeleccionada);
-                        
-                        // Obtenemos el objeto desde nuestra lista en DataManager usando el índice
-                        Asignatura asignaturaSeleccionada = DataManager.listaAsignaturas.get(filaModelo);
-                        
-                        // Simulamos la ventana emergente del video
-                        JOptionPane.showMessageDialog(null, 
-                            "DETALLE DE ASIGNATURA\n\n" +
-                            "Nombre: " + asignaturaSeleccionada.getNombre() + "\n" +
-                            "Código: " + asignaturaSeleccionada.getCodigo() + "\n" +
-                            "Facultad: " + asignaturaSeleccionada.getFacultad() + "\n" +
-                            "Créditos: " + asignaturaSeleccionada.getCreditos() + "\n" +
-                            "Cupos Disponibles: " + asignaturaSeleccionada.getCuposDisponibles() + "\n\n" +
-                            "Estado: ABIERTA PARA INSCRIPCIÓN",
-                            "Información del Grupo",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    }
-                }
-            }
-        });
-        
-        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
-        t.setRowSorter(sorter);
-        
-        ActionListener buscarAction = e -> {
-            String text = txt.getText();
-            if (text.trim().length() == 0) sorter.setRowFilter(null);
-            else sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
-        };
-        btn.addActionListener(buscarAction);
-        txt.addActionListener(buscarAction);
-        
-        p.add(new JScrollPane(t), BorderLayout.CENTER);
-        return p;
-    }
-
+    
     // =======================================================
     //             MÉTODOS DE ESTILO (NO BORRAR)
     // =======================================================
