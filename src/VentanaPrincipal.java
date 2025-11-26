@@ -1,463 +1,431 @@
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableRowSorter; // <--- AGREGAR ESTA
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;         // <--- AGREGAR ESTA
-import java.awt.event.KeyEvent;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.awt.event.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class VentanaPrincipal extends JFrame {
 
+    // --- COLORES EXACTOS DEL SIA ---
+    private final Color COLOR_HEADER_TOP = new Color(255, 204, 0);   // Amarillo UNAL
+    private final Color COLOR_HEADER_BOT = new Color(102, 51, 0);    // Marrón Oscuro
+    private final Color COLOR_MENU_BG    = new Color(255, 255, 224); // Beige claro
+    private final Color COLOR_MENU_ITEM  = new Color(102, 51, 0);    // Marrón texto
+    
+    // Colores específicos para REPORTE DE NOTAS
+    private final Color COLOR_REPORTE_BG = new Color(235, 235, 235); // Gris recuadros
+    private final Color COLOR_TABLA_HEAD_HISTORIA = new Color(240, 240, 240); // Gris cabecera notas
+    
+    // Colores para TABLAS GENERALES (Ocre)
+    private final Color COLOR_TABLA_HEAD_GEN = new Color(153, 51, 0); // Ocre/Rojo Ladrillo
+
     private JPanel panelContenido;
     private CardLayout cardLayout;
+    private String usuarioActual;
+    private JLabel lblRuta;
 
-    public VentanaPrincipal() {
-        setTitle("SIA - Sistema de Información Académica");
-        setSize(1400, 1000);
+    public VentanaPrincipal(String usuario) {
+        this.usuarioActual = usuario;
+
+        setTitle("Sistema de Información Académica - Universidad Nacional de Colombia");
+        setSize(1280, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // 1. HEADER
+        // 1. ESTRUCTURA BASE
         add(crearEncabezado(), BorderLayout.NORTH);
-
-        // 2. MENÚ LATERAL (IZQUIERDA)
         add(crearMenuLateral(), BorderLayout.WEST);
+        add(crearPanelDerecho(), BorderLayout.EAST);
 
-        // 3. NOTICIAS (DERECHA) - ¡NUEVO!
-        add(crearPanelNoticias(), BorderLayout.EAST);
+        // 2. CONTENIDO CENTRAL
+        JPanel centroWrapper = new JPanel(new BorderLayout());
+        centroWrapper.setBackground(Color.WHITE);
+        
+        // Barra de Ruta
+        JPanel panelRuta = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelRuta.setBackground(Color.WHITE);
+        panelRuta.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
+        lblRuta = new JLabel("Está en: Inicio");
+        lblRuta.setFont(new Font("Verdana", Font.PLAIN, 10));
+        lblRuta.setForeground(Color.GRAY);
+        panelRuta.add(lblRuta);
+        centroWrapper.add(panelRuta, BorderLayout.NORTH);
 
-        // 4. CONTENIDO (CENTRO)
+        // Paneles cambiantes
         cardLayout = new CardLayout();
         panelContenido = new JPanel(cardLayout);
         panelContenido.setBackground(Color.WHITE);
         
-        // Agregar vistas
+        // --- AQUÍ ESTÁN TODOS LOS PANELES CARGADOS ---
         panelContenido.add(crearPanelBienvenida(), "INICIO");
-        panelContenido.add(crearPanelHistoriaAcademica(), "HISTORIA");
+        panelContenido.add(crearPanelHistoria(), "HISTORIA");
         panelContenido.add(crearPanelHorario(), "HORARIO");
-        panelContenido.add(crearPanelDatosPersonales(), "DATOS");
+        panelContenido.add(crearPanelDatos(), "DATOS");
         panelContenido.add(crearPanelBuscador(), "BUSCADOR");
-        
-        add(panelContenido, BorderLayout.CENTER);
+
+        centroWrapper.add(panelContenido, BorderLayout.CENTER);
+        add(centroWrapper, BorderLayout.CENTER);
 
         setVisible(true);
     }
 
-    // --- DISEÑO DEL ENCABEZADO ---
+    // =======================================================
+    //                 ENCABEZADO Y MENÚ
+    // =======================================================
     private JPanel crearEncabezado() {
-        JPanel headerContainer = new JPanel();
-        headerContainer.setLayout(new BoxLayout(headerContainer, BoxLayout.Y_AXIS));
-        headerContainer.setPreferredSize(new Dimension(1400, 110));
+        JPanel header = new JPanel();
+        header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
 
-        JPanel recuadro4 = new JPanel(null);
-        recuadro4.setBackground(new Color(255, 203, 0)); // Amarillo UNAL
-        recuadro4.setPreferredSize(new Dimension(1400, 80));
+        JPanel top = new JPanel(null);
+        top.setBackground(COLOR_HEADER_TOP);
+        top.setPreferredSize(new Dimension(1280, 75));
         
-        ImageIcon iconoOriginal = new ImageIcon("LogoUN.png");
-        Image imagenEscalada = iconoOriginal.getImage().getScaledInstance(150, 110, Image.SCALE_SMOOTH);
-        JLabel lblImagen = new JLabel(new ImageIcon(imagenEscalada));
-        lblImagen.setBounds(40, -10, 120, 100);
-        recuadro4.add(lblImagen);
+        JLabel lblUn = new JLabel("<html><b>UNIVERSIDAD NACIONAL</b><br>DE COLOMBIA</html>");
+        lblUn.setFont(new Font("Arial", Font.BOLD, 16));
+        lblUn.setBounds(30, 15, 300, 40);
+        top.add(lblUn);
+        
+        try {
+            ImageIcon icon = new ImageIcon("UNlogo.png");
+            if (icon.getIconWidth() > 0) {
+                Image img = icon.getImage().getScaledInstance(100, 80, Image.SCALE_SMOOTH);
+                JLabel lblImg = new JLabel(new ImageIcon(img));
+                lblImg.setBounds(10, -5, 100, 90);
+                lblUn.setBounds(120, 15, 300, 40);
+                top.add(lblImg);
+            }
+        } catch (Exception e) {}
 
-        JPanel recuadro3 = new JPanel(new FlowLayout(FlowLayout.LEFT, 80, 5));
-        recuadro3.setBackground(new Color(158, 124, 0)); // Ocre Oscuro
-        recuadro3.setPreferredSize(new Dimension(1400, 30));
+        JPanel bot = new JPanel(new BorderLayout());
+        bot.setBackground(COLOR_HEADER_BOT);
+        bot.setPreferredSize(new Dimension(1280, 25));
+        
+        JLabel lblSia = new JLabel("  SISTEMA DE INFORMACIÓN ACADÉMICA (SIA)");
+        lblSia.setForeground(Color.WHITE);
+        lblSia.setFont(new Font("Verdana", Font.BOLD, 10));
+        JLabel lblUser = new JLabel("Usuario: " + usuarioActual + "  |  Perfil: Estudiante  ");
+        lblUser.setForeground(new Color(255, 255, 200));
+        lblUser.setFont(new Font("Verdana", Font.PLAIN, 10));
 
-        JLabel lblSIA = new JLabel("Sistema de Información Académica  |  Rol: Estudiante");
-        lblSIA.setForeground(new Color(253, 250, 234));
-        lblSIA.setFont(new Font("Arial", Font.BOLD, 14));
-        recuadro3.add(lblSIA);
-
-        headerContainer.add(recuadro4);
-        headerContainer.add(recuadro3);
-        return headerContainer;
+        bot.add(lblSia, BorderLayout.WEST);
+        bot.add(lblUser, BorderLayout.EAST);
+        header.add(top); header.add(bot);
+        return header;
     }
 
-    // --- DISEÑO DEL MENÚ LATERAL (TIPO ACORDEÓN) ---
     private JPanel crearMenuLateral() {
         JPanel menu = new JPanel();
-        menu.setBackground(new Color(245, 245, 220)); 
-        menu.setPreferredSize(new Dimension(260, 0));
         menu.setLayout(new BoxLayout(menu, BoxLayout.Y_AXIS));
-        menu.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 2, new Color(200, 200, 150)));
+        menu.setBackground(COLOR_MENU_BG);
+        menu.setPreferredSize(new Dimension(240, 0));
+        menu.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));
 
+        JLabel titulo = new JLabel(" MENÚ PRINCIPAL");
+        titulo.setOpaque(true);
+        titulo.setBackground(new Color(220, 220, 200));
+        titulo.setForeground(COLOR_MENU_ITEM);
+        titulo.setFont(new Font("Verdana", Font.BOLD, 11));
+        titulo.setMaximumSize(new Dimension(240, 25));
+        titulo.setBorder(new EmptyBorder(5, 5, 5, 5));
+        menu.add(titulo);
+
+        menu.add(itemMenu("Inicio", false, e -> { cardLayout.show(panelContenido, "INICIO"); lblRuta.setText("Está en: Inicio"); }));
+        menu.add(categoriaMenu("Apoyo Académico"));
+        menu.add(subItemMenu("Mi Horario", e -> { cardLayout.show(panelContenido, "HORARIO"); lblRuta.setText("Está en: Apoyo Académico >> Mi Horario"); }));
+        menu.add(categoriaMenu("Archivo"));
+        menu.add(subItemMenu("Historia Académica", e -> { cardLayout.show(panelContenido, "HISTORIA"); lblRuta.setText("Está en: Archivo >> Historia Académica"); }));
+        menu.add(subItemMenu("Datos Personales", e -> { cardLayout.show(panelContenido, "DATOS"); lblRuta.setText("Está en: Archivo >> Datos Personales"); }));
+        menu.add(categoriaMenu("Buscador"));
+        menu.add(subItemMenu("Catálogo de Cursos", e -> { cardLayout.show(panelContenido, "BUSCADOR"); lblRuta.setText("Está en: Buscador >> Cursos"); }));
+        
         menu.add(Box.createVerticalStrut(20));
-        
-        // Botón Inicio
-        agregarBotonMenu(menu, "Inicio", e -> cardLayout.show(panelContenido, "INICIO"));
-
-        // SECCIÓN: APOYO ACADÉMICO (Ver PDF pág 2)
-        agregarTituloSeccion(menu, "APOYO ACADÉMICO");
-        agregarSubMenu(menu, "Mi Horario", e -> cardLayout.show(panelContenido, "HORARIO"));
-        agregarSubMenu(menu, "Mis Calificaciones", e -> cardLayout.show(panelContenido, "HISTORIA"));
-        agregarSubMenu(menu, "Inscripción Materias", e -> JOptionPane.showMessageDialog(null, "Fuera de fechas"));
-
-        // SECCIÓN: ARCHIVO (Ver PDF pág 2)
-        agregarTituloSeccion(menu, "ARCHIVO");
-        agregarSubMenu(menu, "Mis Datos Personales", e -> cardLayout.show(panelContenido, "DATOS"));
-        agregarSubMenu(menu, "Historia Académica", e -> cardLayout.show(panelContenido, "HISTORIA"));
-
-        // SECCIÓN: LIBRE ACCESO
-        agregarTituloSeccion(menu, "LIBRE ACCESO");
-        agregarSubMenu(menu, "Buscador de Cursos", e -> cardLayout.show(panelContenido, "BUSCADOR"));
-
-        menu.add(Box.createVerticalGlue());
-        
         JButton btnSalir = new JButton("Cerrar Sesión");
         btnSalir.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnSalir.setBackground(new Color(173, 75, 52));
-        btnSalir.setForeground(Color.WHITE);
-        btnSalir.addActionListener(e -> {
-            new VentanaLogin().setVisible(true);
-            dispose();
-        });
+        btnSalir.addActionListener(e -> { new VentanaLogin().setVisible(true); dispose(); });
         menu.add(btnSalir);
-        menu.add(Box.createVerticalStrut(20));
-
         return menu;
     }
 
-    // Helpers para el menú
-    private void agregarTituloSeccion(JPanel panel, String texto) {
-        JLabel label = new JLabel(texto);
-        label.setFont(new Font("Arial", Font.BOLD, 12));
-        label.setForeground(new Color(100, 100, 100));
-        label.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panel.add(Box.createVerticalStrut(15));
-        panel.add(label);
-        panel.add(Box.createVerticalStrut(5));
+    private JLabel categoriaMenu(String texto) {
+        JLabel l = new JLabel("[+] " + texto);
+        l.setFont(new Font("Verdana", Font.BOLD, 11)); l.setForeground(COLOR_MENU_ITEM);
+        l.setBorder(new EmptyBorder(5, 10, 2, 10)); l.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return l;
+    }
+    private JLabel itemMenu(String texto, boolean esSub, ActionListener action) {
+        JLabel l = new JLabel((esSub ? "   • " : "") + texto);
+        l.setFont(new Font("Verdana", Font.PLAIN, 11)); l.setForeground(Color.BLACK);
+        l.setBorder(new EmptyBorder(2, 15, 2, 10)); l.setAlignmentX(Component.LEFT_ALIGNMENT);
+        l.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        l.addMouseListener(new MouseAdapter() { public void mouseClicked(MouseEvent e) { action.actionPerformed(null); } });
+        return l;
+    }
+    private JLabel subItemMenu(String texto, ActionListener action) {
+        JLabel l = new JLabel("      " + texto);
+        l.setFont(new Font("Verdana", Font.PLAIN, 11)); l.setForeground(new Color(50, 50, 50));
+        l.setBorder(new EmptyBorder(2, 10, 2, 10)); l.setAlignmentX(Component.LEFT_ALIGNMENT);
+        l.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        l.addMouseListener(new MouseAdapter() { public void mouseClicked(MouseEvent e) { action.actionPerformed(null); } });
+        return l;
+    }
+    
+    private JPanel crearPanelDerecho() {
+        JPanel p = new JPanel();
+        p.setBackground(new Color(240, 240, 230));
+        p.setPreferredSize(new Dimension(150, 0));
+        p.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, Color.LIGHT_GRAY));
+        return p;
     }
 
-    private void agregarBotonMenu(JPanel panel, String texto, ActionListener accion) {
-        JButton btn = new JButton(texto);
-        estilizarBotonMenu(btn);
-        btn.setBackground(new Color(255, 240, 0));
-        btn.addActionListener(accion);
-        panel.add(btn);
-    }
-
-    private void agregarSubMenu(JPanel panel, String texto, ActionListener accion) {
-        JButton btn = new JButton("  ↳ " + texto); // Indentación visual
-        estilizarBotonMenu(btn);
-        btn.setBackground(new Color(250, 250, 240)); // Más claro
-        btn.setFont(new Font("Arial", Font.PLAIN, 12));
-        btn.addActionListener(accion);
-        panel.add(btn);
-        panel.add(Box.createVerticalStrut(3));
-    }
-
-    private void estilizarBotonMenu(JButton btn) {
-        btn.setMaximumSize(new Dimension(220, 30));
-        btn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btn.setFocusPainted(false);
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-    }
-
-    // --- PANTALLAS (PANELES) ---
+    // =======================================================
+    //                 PANTALLAS DE CONTENIDO (COMPLETAS)
+    // =======================================================
 
     private JPanel crearPanelBienvenida() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBackground(Color.WHITE);
-        JLabel l = new JLabel("<html><center><h1>Bienvenido al SIA</h1><p>Seleccione un servicio del menú lateral.</p></center></html>", SwingConstants.CENTER);
-        p.add(l, BorderLayout.CENTER);
+        p.add(new JLabel("<html><center><h2>Bienvenido al SIA</h2></center></html>", SwingConstants.CENTER));
         return p;
     }
 
-    // REQUERIMIENTO: HORARIO (Descargar como PDF vía Impresora Virtual)
+    // --- 1. HISTORIA ACADÉMICA (Estilo Reporte Gris) ---
+    private JPanel crearPanelHistoria() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBackground(Color.WHITE);
+        p.setBorder(new EmptyBorder(10, 20, 10, 20));
+
+        // Cabecera Reporte
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
+        topPanel.setBackground(Color.WHITE);
+
+        JPanel headerInfo = new JPanel(new BorderLayout());
+        headerInfo.setBackground(Color.WHITE);
+        JLabel title = new JLabel("REPORTE DE NOTAS");
+        title.setFont(new Font("Arial", Font.BOLD, 14));
+        String fecha = new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new Date());
+        JLabel date = new JLabel("Generado: " + fecha);
+        date.setFont(new Font("Arial", Font.PLAIN, 11)); date.setForeground(Color.GRAY);
+        headerInfo.add(title, BorderLayout.WEST); headerInfo.add(date, BorderLayout.EAST);
+        topPanel.add(headerInfo); topPanel.add(Box.createVerticalStrut(10));
+
+        topPanel.add(crearCajaInfo("1023941 [ " + usuarioActual + " ]"));
+        topPanel.add(Box.createVerticalStrut(5));
+        topPanel.add(crearCajaInfo("2541 INGENIERÍA DE SISTEMAS"));
+        topPanel.add(Box.createVerticalStrut(15));
+        p.add(topPanel, BorderLayout.NORTH);
+
+        // Tabla
+        String[] cols = {"Asignatura", "Créditos", "Nota", "Periodo", "Calificación"};
+        Object[][] data = DataManager.cargarHistoria(usuarioActual);
+
+        DefaultTableModel model = new DefaultTableModel(data, cols) {
+            public boolean isCellEditable(int r, int c) { return false; }
+        };
+        JTable t = new JTable(model);
+        t.setRowHeight(20); t.setFont(new Font("Arial", Font.PLAIN, 11));
+        t.setShowVerticalLines(false); t.setGridColor(Color.LIGHT_GRAY);
+        
+        JTableHeader th = t.getTableHeader();
+        th.setBackground(COLOR_TABLA_HEAD_HISTORIA);
+        th.setForeground(Color.BLACK);
+        th.setFont(new Font("Arial", Font.BOLD, 11));
+        th.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+
+        p.add(new JScrollPane(t), BorderLayout.CENTER);
+        return p;
+    }
+    
+    private JPanel crearCajaInfo(String texto) {
+        JPanel box = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        box.setBackground(COLOR_REPORTE_BG);
+        box.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+        JLabel lbl = new JLabel(texto);
+        lbl.setFont(new Font("Arial", Font.BOLD, 12));
+        box.add(lbl);
+        return box;
+    }
+
+    // --- 2. DATOS PERSONALES (ESTILO FICHA COMPLETA) ---
+    private JPanel crearPanelDatos() {
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        p.setBackground(Color.WHITE);
+        p.setBorder(new EmptyBorder(20, 40, 20, 40));
+
+        JLabel titulo = new JLabel("MIS DATOS PERSONALES");
+        titulo.setFont(new Font("Arial", Font.BOLD, 16));
+        titulo.setForeground(new Color(153, 0, 0));
+        titulo.setAlignmentX(Component.LEFT_ALIGNMENT);
+        p.add(titulo); p.add(Box.createVerticalStrut(20));
+
+        JPanel ficha = new JPanel(new GridLayout(0, 2, 10, 10)); // Grid para formato ficha
+        ficha.setBackground(Color.WHITE);
+        ficha.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(Color.LIGHT_GRAY), 
+                "Información Básica", 
+                TitledBorder.DEFAULT_JUSTIFICATION, 
+                TitledBorder.DEFAULT_POSITION, 
+                new Font("Arial", Font.BOLD, 12)
+        ));
+
+        // CAMPOS COMPLETOS
+        agregarCampoFicha(ficha, "Nombre Completo:", usuarioActual.toUpperCase());
+        agregarCampoFicha(ficha, "Documento de Identidad:", "1000" + (int)(Math.random()*9000));
+        agregarCampoFicha(ficha, "Tipo de Sangre:", "O+");
+        agregarCampoFicha(ficha, "Fecha de Nacimiento:", "01/01/2000");
+        agregarCampoFicha(ficha, "Estado Civil:", "Soltero(a)");
+        agregarCampoFicha(ficha, "Dirección:", "Carrera 30 # 45-03");
+        agregarCampoFicha(ficha, "Teléfono:", "3165000");
+        agregarCampoFicha(ficha, "Correo Institucional:", usuarioActual + "@unal.edu.co");
+
+        ficha.setMaximumSize(new Dimension(800, 250)); // Tamaño suficiente para ver todo
+        ficha.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        p.add(ficha);
+        p.add(Box.createVerticalGlue()); // Relleno hacia abajo
+        return p;
+    }
+    
+    private void agregarCampoFicha(JPanel panel, String label, String valor) {
+        JPanel row = new JPanel(new BorderLayout());
+        row.setBackground(Color.WHITE);
+        JLabel l = new JLabel(label + "  ");
+        l.setFont(new Font("Arial", Font.BOLD, 11));
+        l.setForeground(new Color(100, 100, 100)); // Gris oscuro
+        
+        JLabel v = new JLabel(valor);
+        v.setFont(new Font("Arial", Font.PLAIN, 11));
+        v.setForeground(Color.BLACK);
+        
+        row.add(l, BorderLayout.WEST);
+        row.add(v, BorderLayout.CENTER);
+        panel.add(row);
+    }
+
+    // --- 3. HORARIO (CON BOTÓN AMARILLO Y FUNCIONALIDAD) ---
     private JPanel crearPanelHorario() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBackground(Color.WHITE);
+        p.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        // --- Panel Superior ---
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(Color.WHITE);
-        topPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-        JLabel titulo = new JLabel(" Mi Horario (Periodo 2025-1)", SwingConstants.LEFT);
-        titulo.setFont(new Font("Arial", Font.BOLD, 18));
+        JPanel top = new JPanel(new BorderLayout());
+        top.setBackground(Color.WHITE);
         
-        // Botón corregido
-        JButton btnPDF = new JButton("Guardar como PDF / Imprimir");
-        btnPDF.setBackground(new Color(255, 203, 0));
-        btnPDF.setFocusPainted(false);
-        btnPDF.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        topPanel.add(titulo, BorderLayout.WEST);
-        topPanel.add(btnPDF, BorderLayout.EAST);
-        p.add(topPanel, BorderLayout.NORTH);
-
-        // --- Tabla de Datos ---
-        String[] col = {"Cód", "Asignatura", "Grp", "Docente", "Día", "Hora", "Salón"};
-        Object[][] data = {
-            {"2016", "Cálculo Integral", "1", "Pedro Pérez", "LUN/MIE", "07:00 - 09:00", "404-201"},
-            {"2025", "Física II", "2", "Maria Lopez", "MAR/JUE", "09:00 - 11:00", "453-102"},
-            {"1001", "Programación OOP", "1", "Juan Dev", "VIE", "14:00 - 17:00", "Sala 3"},
-            {"2019", "Ecuaciones Diferenciales", "3", "Carlos Mateus", "LUN/VIE", "11:00 - 13:00", "405-202"}
-        };
-
-        // Modelo NO editable
-        DefaultTableModel modelo = new DefaultTableModel(data, col) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-
-        JTable t = new JTable(modelo);
-        t.setRowHeight(25);
-        t.getTableHeader().setBackground(new Color(230, 180, 50));
-        t.getTableHeader().setForeground(Color.WHITE);
-        t.getTableHeader().setReorderingAllowed(false);
+        JLabel titulo = new JLabel("Horario de Clases 2025-1");
+        titulo.setFont(new Font("Verdana", Font.BOLD, 14));
+        titulo.setForeground(new Color(153, 0, 0));
         
-        // Ajustamos el ancho de las columnas para que se vea bien en PDF
-        t.getColumnModel().getColumn(1).setPreferredWidth(200); // Asignatura más ancha
+        JButton btnPrint = new JButton("Versión para impresión");
+        btnPrint.setBackground(new Color(255, 204, 0));
+        btnPrint.setFont(new Font("Verdana", Font.BOLD, 10));
+        btnPrint.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        btnPrint.setPreferredSize(new Dimension(160, 25));
+        btnPrint.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        p.add(new JScrollPane(t), BorderLayout.CENTER);
-
-        // --- LÓGICA DE PDF (Sin errores de imagen) ---
-        btnPDF.addActionListener(e -> {
-            // Mensaje previo para guiar al usuario
-            JOptionPane.showMessageDialog(this, 
-                "Para guardar como PDF, seleccione 'Microsoft Print to PDF' \no 'Guardar como PDF' en la siguiente ventana.",
-                "Instrucciones", JOptionPane.INFORMATION_MESSAGE);
-
+        btnPrint.addActionListener(e -> {
+            JOptionPane.showMessageDialog(this, "Seleccione 'Microsoft Print to PDF' en la ventana de impresión.");
             try {
-                // Encabezados SIMPLES (Texto puro para evitar error "archivo no encontrado")
-                java.text.MessageFormat header = new java.text.MessageFormat("Universidad Nacional de Colombia - Horario 2025-1");
-                java.text.MessageFormat footer = new java.text.MessageFormat("Página {0,number,integer}");
-                
-                // Abre el diálogo de impresión del sistema
-                boolean complete = t.print(JTable.PrintMode.FIT_WIDTH, header, footer);
-                
-                if (complete) {
-                    JOptionPane.showMessageDialog(null, "Proceso finalizado.", "Estado", JOptionPane.INFORMATION_MESSAGE);
-                } 
-            } catch (java.awt.print.PrinterException pe) {
-                JOptionPane.showMessageDialog(null, "Error: " + pe.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
+                JTable t = (JTable) ((JScrollPane) p.getComponent(1)).getViewport().getView();
+                t.print(JTable.PrintMode.FIT_WIDTH, new java.text.MessageFormat("Horario UNAL"), new java.text.MessageFormat("Página {0}"));
+            } catch(Exception ex){ JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage()); }
         });
 
+        top.add(titulo, BorderLayout.WEST);
+        top.add(btnPrint, BorderLayout.EAST);
+        p.add(top, BorderLayout.NORTH);
+
+        String[] cols = {"Cód", "Asignatura", "Grp", "Docente", "Día", "Hora", "Salón"};
+        Object[][] data = DataManager.cargarHorario(usuarioActual);
+        
+        JTable t = diseñarTablaSIA(data, cols);
+        p.add(new JScrollPane(t), BorderLayout.CENTER);
         return p;
     }
 
-    // REQUERIMIENTO: HISTORIA ACADÉMICA (SOLO LECTURA)
-    private JPanel crearPanelHistoriaAcademica() {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBackground(Color.WHITE);
-        
-        JLabel titulo = new JLabel(" Historia Académica", SwingConstants.LEFT);
-        titulo.setFont(new Font("Arial", Font.BOLD, 18));
-        titulo.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        p.add(titulo, BorderLayout.NORTH);
-
-        String[] columnas = {"Código", "Asignatura", "Créditos", "Calificación", "Estado"};
-        Object[][] datos = {
-            {"2015698", "Cálculo Diferencial", "4", "3.8", "APROBADA"},
-            {"2015702", "Programación Orientada a Objetos", "3", "4.5", "APROBADA"},
-            {"2015123", "Física Mecánica", "4", "3.0", "APROBADA"},
-            {"2025001", "Lecto-Escritura", "2", "4.2", "APROBADA"},
-        };
-
-        // BLOQUEO DE EDICIÓN
-        DefaultTableModel modelo = new DefaultTableModel(datos, columnas) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-
-        JTable tabla = new JTable(modelo);
-        tabla.setRowHeight(25);
-        tabla.getTableHeader().setBackground(new Color(230, 180, 50));
-        tabla.getTableHeader().setForeground(Color.WHITE);
-        tabla.getTableHeader().setReorderingAllowed(false);
-        
-        p.add(new JScrollPane(tabla), BorderLayout.CENTER);
-        
-        JPanel panelPromedio = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        panelPromedio.add(new JLabel("Promedio Aritmético Ponderado (P.A.P.A): 3.9"));
-        panelPromedio.setBackground(new Color(245, 245, 220));
-        p.add(panelPromedio, BorderLayout.SOUTH);
-
-        return p;
-    }
-
-    // REQUERIMIENTO: DATOS PERSONALES
-    private JPanel crearPanelDatosPersonales() {
-        JPanel p = new JPanel(null);
-        p.setBackground(Color.WHITE);
-
-        JLabel titulo = new JLabel("Mis Datos Personales");
-        titulo.setFont(new Font("Arial", Font.BOLD, 18));
-        titulo.setBounds(20, 20, 300, 30);
-        p.add(titulo);
-
-        // Simulamos campos de solo lectura
-        agregarCampoDato(p, "Nombre Completo:", "Pepito Pérez", 60);
-        agregarCampoDato(p, "Documento:", "1.000.123.456", 100);
-        agregarCampoDato(p, "Correo Institucional:", "pperez@unal.edu.co", 140);
-        agregarCampoDato(p, "Programa Curricular:", "Ingeniería de Sistemas", 180);
-        agregarCampoDato(p, "Sede:", "Bogotá", 220);
-
-        return p;
-    }
-
-    private void agregarCampoDato(JPanel p, String label, String valor, int y) {
-        JLabel lbl = new JLabel(label);
-        lbl.setFont(new Font("Arial", Font.BOLD, 12));
-        lbl.setBounds(50, y, 150, 25);
-        p.add(lbl);
-
-        JTextField txt = new JTextField(valor);
-        txt.setEditable(false);
-        txt.setBackground(new Color(250, 250, 250));
-        txt.setBounds(200, y, 250, 25);
-        p.add(txt);
-    }
-    
-    // REQUERIMIENTO: BUSCADOR DE CURSOS (SOLO LECTURA)
+    // --- 4. BUSCADOR (COMPLETO CON FORMULARIO Y TABLA) ---
     private JPanel crearPanelBuscador() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBackground(Color.WHITE);
-
-        // --- 1. Panel Superior (Barra de Búsqueda) ---
-        JPanel panelBusqueda = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panelBusqueda.setBackground(new Color(245, 245, 220));
-        panelBusqueda.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-
-        JLabel lblBuscar = new JLabel("Buscar Asignatura:");
-        lblBuscar.setFont(new Font("Arial", Font.BOLD, 14));
+        p.setBorder(new EmptyBorder(20, 20, 20, 20));
         
-        JTextField txtBuscar = new JTextField(20);
+        // Formulario Gris
+        JPanel form = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
+        form.setBackground(new Color(240, 240, 240));
+        form.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Criterios", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, new Font("Verdana", Font.BOLD, 11)));
         
-        JButton btnBuscar = new JButton("Filtrar");
-        btnBuscar.setBackground(new Color(255, 203, 0));
-
-        panelBusqueda.add(lblBuscar);
-        panelBusqueda.add(txtBuscar);
-        panelBusqueda.add(btnBuscar);
+        JTextField txt = new JTextField(20);
+        JButton btn = new JButton("Buscar");
+        btn.setBackground(new Color(220, 220, 220));
+        form.add(new JLabel("Palabra Clave: ")); form.add(txt); form.add(btn);
+        p.add(form, BorderLayout.NORTH);
         
-        p.add(panelBusqueda, BorderLayout.NORTH);
-
-        // --- 2. Tabla de Cursos Ofertados ---
-        String[] columnas = {"Código", "Asignatura", "Facultad", "Créditos", "Cupos"};
-        Object[][] datos = {
-            {"1000001", "Cálculo Diferencial", "Ciencias", "4", "45"},
-            {"1000002", "Cálculo Integral", "Ciencias", "4", "40"},
-            {"1000003", "Álgebra Lineal", "Ciencias", "4", "50"},
-            {"2001562", "Programación Orientada a Objetos", "Ingeniería", "3", "30"},
-            {"2001563", "Estructuras de Datos", "Ingeniería", "3", "25"},
-            {"2001564", "Ingeniería de Software", "Ingeniería", "3", "25"},
-            {"3005210", "Historia de Colombia", "Ciencias Humanas", "3", "100"},
-            {"3005211", "Antropología Social", "Ciencias Humanas", "3", "80"},
-            {"1000045", "Física Mecánica", "Ciencias", "4", "60"},
-            {"1000046", "Física de Electromagnetismo", "Ciencias", "4", "55"}
+        // Tabla Resultados
+        String[] cols = {"Código", "Asignatura", "Facultad", "Créditos", "Cupos"};
+        Object[][] data = DataManager.cargarCatalogo(); // Carga desde TXT
+        
+        DefaultTableModel model = new DefaultTableModel(data, cols) {
+            public boolean isCellEditable(int r, int c) { return false; }
         };
-
-        // --- AQUÍ ESTÁ EL CAMBIO IMPORTANTE ---
-        // Sobrescribimos el modelo para impedir la edición
-        DefaultTableModel modelo = new DefaultTableModel(datos, columnas) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false; // ESTO HACE QUE NO SE PUEDA EDITAR NADA
-            }
+        JTable t = new JTable(model);
+        diseñarEstiloTabla(t); // Aplica estilo Ocre
+        
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+        t.setRowSorter(sorter);
+        
+        ActionListener buscarAction = e -> {
+            String text = txt.getText();
+            if (text.trim().length() == 0) sorter.setRowFilter(null);
+            else sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
         };
+        btn.addActionListener(buscarAction);
+        txt.addActionListener(buscarAction);
+        
+        p.add(new JScrollPane(t), BorderLayout.CENTER);
+        return p;
+    }
 
-        JTable tabla = new JTable(modelo);
-        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(modelo);
-        tabla.setRowSorter(sorter);
-
-        tabla.setRowHeight(25);
-        tabla.getTableHeader().setBackground(new Color(158, 124, 0));
-        tabla.getTableHeader().setForeground(Color.WHITE);
-        tabla.getTableHeader().setReorderingAllowed(false); // También impide mover columnas
-
-        p.add(new JScrollPane(tabla), BorderLayout.CENTER);
-
-        // --- 3. Lógica del Filtro ---
-        KeyAdapter eventoTeclado = new KeyAdapter() {
+    // =======================================================
+    //             MÉTODOS DE ESTILO (NO BORRAR)
+    // =======================================================
+    private JTable diseñarTablaSIA(Object[][] data, String[] cols) {
+        DefaultTableModel model = new DefaultTableModel(data, cols) {
             @Override
-            public void keyReleased(KeyEvent e) {
-                String filtro = txtBuscar.getText();
-                if (filtro.trim().length() == 0) {
-                    sorter.setRowFilter(null);
-                } else {
-                    sorter.setRowFilter(RowFilter.regexFilter("(?i)" + filtro));
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
+        JTable t = new JTable(model);
+        diseñarEstiloTabla(t);
+        return t;
+    }
+
+    private void diseñarEstiloTabla(JTable t) {
+        t.setRowHeight(22);
+        t.setFont(new Font("Verdana", Font.PLAIN, 11));
+        t.setShowVerticalLines(true);
+        t.setGridColor(Color.LIGHT_GRAY);
+        
+        // CABECERA COLOR OCRE/ROJO LADRILLO
+        JTableHeader header = t.getTableHeader();
+        header.setBackground(COLOR_TABLA_HEAD_GEN);
+        header.setForeground(Color.WHITE);
+        header.setFont(new Font("Verdana", Font.BOLD, 11));
+        
+        t.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (!isSelected) {
+                    c.setBackground(row % 2 == 0 ? Color.WHITE : new Color(250, 250, 245));
                 }
-            }
-        };  
-        
-        txtBuscar.addKeyListener(eventoTeclado);
-        
-        btnBuscar.addActionListener(e -> {
-            String filtro = txtBuscar.getText();
-            if (filtro.trim().length() == 0) {
-                sorter.setRowFilter(null);
-            } else {
-                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + filtro));
+                return c;
             }
         });
-
-        return p;
-    }
-    
-    // REQUERIMIENTO: SERVICIOS EXTERNOS Y NOTICIAS (Zona Derecha - PDF Pág 7)
-    private JPanel crearPanelNoticias() {
-        JPanel p = new JPanel();
-        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        p.setBackground(new Color(245, 245, 220)); // Beige fondo
-        p.setPreferredSize(new Dimension(200, 0));
-        p.setBorder(BorderFactory.createMatteBorder(0, 2, 0, 0, new Color(200, 200, 150))); // Borde izquierdo
-        
-        // Espaciado inicial
-        p.add(Box.createVerticalStrut(20));
-
-        // Módulo 1: Noticias
-        agregarWidgetDerecho(p, "ÚLTIMAS NOTICIAS", 
-            "<html>- Inscripción Examen Saber Pro 2025<br><br>- Cierre de evaluacion docente el 20 Nov.</html>");
-
-        // Módulo 2: Atención
-        agregarWidgetDerecho(p, "ATENCIÓN A USUARIO", 
-            "<html>- Sistema de Quejas y Reclamos<br><br>- Mesa de Ayuda (3165000 ext 123)</html>");
-
-        // Módulo 3: Enlaces de Interés
-        agregarWidgetDerecho(p, "ENLACES RÁPIDOS", 
-            "<html>- Bibliotecas<br>- Bienestar Universitario<br>- Campus Virtual</html>");
-
-        p.add(Box.createVerticalGlue()); // Relleno final
-        return p;
-    }
-
-    // Helper para crear los "cajoncitos" de la derecha
-    private void agregarWidgetDerecho(JPanel panel, String titulo, String contenido) {
-        // Contenedor del widget
-        JPanel widget = new JPanel(new BorderLayout());
-        widget.setMaximumSize(new Dimension(180, 150));
-        widget.setBorder(BorderFactory.createLineBorder(new Color(200, 160, 50), 1)); // Borde ocre
-        
-        // Título del widget (Fondo amarillo oscuro)
-        JLabel lblTitulo = new JLabel(" " + titulo);
-        lblTitulo.setOpaque(true);
-        lblTitulo.setBackground(new Color(210, 180, 80)); 
-        lblTitulo.setForeground(Color.WHITE);
-        lblTitulo.setFont(new Font("Arial", Font.BOLD, 11));
-        lblTitulo.setPreferredSize(new Dimension(180, 25));
-        
-        // Contenido del widget
-        JLabel lblContenido = new JLabel(contenido);
-        lblContenido.setFont(new Font("Arial", Font.PLAIN, 10));
-        lblContenido.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        lblContenido.setVerticalAlignment(SwingConstants.TOP);
-        
-        widget.add(lblTitulo, BorderLayout.NORTH);
-        widget.add(lblContenido, BorderLayout.CENTER);
-        
-        panel.add(widget);
-        panel.add(Box.createVerticalStrut(15)); // Espacio entre widgets
     }
 }
