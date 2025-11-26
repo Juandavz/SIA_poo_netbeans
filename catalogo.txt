@@ -1,0 +1,57 @@
+========================================
+Codigo: 1000001
+Asignatura: Cálculo Diferencial
+Facultad: Ciencias
+Creditos: 4
+Cupos: 45
+Tipologia: Fundamentacion (Obligatoria)
+========================================
+Codigo: 1000002
+Asignatura: Cálculo Integral
+Facultad: Ciencias
+Creditos: 4
+Cupos: 40
+Tipologia: Fundamentacion (Obligatoria)
+========================================
+Codigo: 1000045
+Asignatura: Inglés I
+Facultad: Ciencias Humanas
+Creditos: 3
+Cupos: 80
+Tipologia: Nivelacion
+========================================
+Codigo: 2001562
+Asignatura: Programación Orientada a Objetos
+Facultad: Ingeniería
+Creditos: 3
+Cupos: 30
+Tipologia: Disciplinar (Obligatoria)
+========================================
+Codigo: 2001563
+Asignatura: Estructuras de Datos
+Facultad: Ingeniería
+Creditos: 3
+Cupos: 25
+Tipologia: Disciplinar (Obligatoria)
+========================================
+Codigo: 3005210
+Asignatura: Historia de Colombia
+Facultad: Ciencias Humanas
+Creditos: 3
+Cupos: 100
+Tipologia: Libre Eleccion
+========================================
+Codigo: 1000048
+Asignatura: Fundamentos de Mecánica
+Facultad: Ciencias
+Creditos: 4
+Cupos: 60
+Tipologia: Fundamentacion (Obligatoria)
+========================================
+Codigo: 4000101
+Asignatura: Inteligencia y desarrollo sostenible
+Facultad: Ingeniería
+Creditos: 3
+Cupos: 20
+Tipologia: Disciplinar (Obligatoria)
+========================================

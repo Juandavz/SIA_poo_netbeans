@@ -1,0 +1,37 @@
+========================================
+Estudiante: pepito
+Codigo: 101
+Asignatura: Fundamentos de Programación
+Grupo: 1
+Docente: Alan Turing
+Dia: LUN/MIE
+Hora: 07:00 - 09:00
+Salon: 404-101
+========================================
+Estudiante: maria
+Codigo: 202
+Asignatura: Física II
+Grupo: 3
+Docente: Albert Einstein
+Dia: MAR/JUE
+Hora: 09:00 - 11:00
+Salon: 453-202
+========================================
+Estudiante: carlos
+Codigo: 303
+Asignatura: Deporte Formativo
+Grupo: 5
+Docente: Entrenador X
+Dia: VIE
+Hora: 14:00 - 16:00
+Salon: Canchas
+========================================
+Estudiante: ana
+Codigo: 404
+Asignatura: Computación Cuántica
+Grupo: 1
+Docente: Richard Feynman
+Dia: LUN/VIE
+Hora: 16:00 - 18:00
+Salon: Laboratorio A
+========================================
