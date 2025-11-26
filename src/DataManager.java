@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 public class DataManager {
 
+    // --- NUEVO: LISTA DE OBJETOS EN MEMORIA ---
+    public static ArrayList<Asignatura> listaAsignaturas = new ArrayList<>();
+
     // --- LECTURA DE USUARIOS ---
     public static boolean validarUsuario(String userIngresado, String passIngresado) {
         try (BufferedReader br = new BufferedReader(new FileReader("usuarios.txt"))) {
@@ -77,10 +80,10 @@ public class DataManager {
         return lista.toArray(new Object[0][0]);
     }
     
-    // --- LECTURA DE CATÁLOGO (Agregar al final de DataManager.java) ---
     public static Object[][] cargarCatalogo() {
-        ArrayList<Object[]> lista = new ArrayList<>();
-        // Intenta leer el archivo catalogo.txt
+        listaAsignaturas.clear(); // Limpiamos la lista para no duplicar al recargar
+        ArrayList<Object[]> datosParaTabla = new ArrayList<>();
+
         try (BufferedReader br = new BufferedReader(new FileReader("catalogo.txt"))) {
             String linea;
             String cod="", asig="", fac="", cred="", cupos="";
@@ -94,15 +97,23 @@ public class DataManager {
                 else if (linea.startsWith("Cupos:")) cupos = linea.substring(6).trim();
                 else if (linea.startsWith("=====")) {
                     if (!cod.isEmpty()) {
-                        lista.add(new Object[]{cod, asig, fac, cred, cupos});
+                        // 1. CREAMOS EL OBJETO (POO REAL)
+                        int creditosInt = Integer.parseInt(cred);
+                        int cuposInt = Integer.parseInt(cupos);
+                        Asignatura nuevaAsignatura = new Asignatura(cod, asig, fac, creditosInt, cuposInt);
+                        
+                        // 2. LO GUARDAMOS EN MEMORIA
+                        listaAsignaturas.add(nuevaAsignatura);
+
+                        // 3. PREPARAMOS LA FILA VISUAL PARA LA TABLA
+                        datosParaTabla.add(new Object[]{cod, asig, fac, cred, cupos});
                     }
                     cod=""; asig=""; fac=""; cred=""; cupos="";
                 }
             }
         } catch (Exception e) { 
-            // Si falla, devuelve un error visible en la tabla
-            return new Object[][]{{"Error", "Falta catalogo.txt", "", "", ""}}; 
+            return new Object[][]{{"Error", "Error leyendo catalogo.txt", "", "", ""}}; 
         }
-        return lista.toArray(new Object[0][0]);
+        return datosParaTabla.toArray(new Object[0][0]);
     }
 }
