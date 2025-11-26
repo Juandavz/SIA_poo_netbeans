@@ -377,6 +377,33 @@ public class VentanaPrincipal extends JFrame {
         JTable t = new JTable(model);
         diseñarEstiloTabla(t); // Aplica estilo Ocre
         
+        t.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) { // Doble clic
+                    int filaSeleccionada = t.getSelectedRow();
+                    if (filaSeleccionada != -1) {
+                        // Convertimos el índice de la vista al del modelo (por si filtraste)
+                        int filaModelo = t.convertRowIndexToModel(filaSeleccionada);
+                        
+                        // Obtenemos el objeto desde nuestra lista en DataManager usando el índice
+                        Asignatura asignaturaSeleccionada = DataManager.listaAsignaturas.get(filaModelo);
+                        
+                        // Simulamos la ventana emergente del video
+                        JOptionPane.showMessageDialog(null, 
+                            "DETALLE DE ASIGNATURA\n\n" +
+                            "Nombre: " + asignaturaSeleccionada.getNombre() + "\n" +
+                            "Código: " + asignaturaSeleccionada.getCodigo() + "\n" +
+                            "Facultad: " + asignaturaSeleccionada.getFacultad() + "\n" +
+                            "Créditos: " + asignaturaSeleccionada.getCreditos() + "\n" +
+                            "Cupos Disponibles: " + asignaturaSeleccionada.getCuposDisponibles() + "\n\n" +
+                            "Estado: ABIERTA PARA INSCRIPCIÓN",
+                            "Información del Grupo",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }
+            }
+        });
+        
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
         t.setRowSorter(sorter);
         
