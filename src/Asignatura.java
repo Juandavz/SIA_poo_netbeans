@@ -8,7 +8,7 @@ public class Asignatura {
     private String tipologia;
 
     // Constructor
-    public Asignatura(String codigo, String nombre, String facultad, int creditos, int cupos) {
+    public Asignatura(String codigo, String nombre, String facultad, int creditos, int cupos, String tipo) {
         this.codigo = codigo;
         this.nombre = nombre;
         this.facultad = facultad;
