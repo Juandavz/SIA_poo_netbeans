@@ -1,0 +1,43 @@
+========================================
+Estudiante: pepito
+Asignatura: 1000001 - Cálculo Diferencial
+Creditos: 4
+Nota: 3.8
+Periodo: 2024-1
+Calificacion: APROBADA
+========================================
+Estudiante: pepito
+Asignatura: 1000002 - Cátedra de Inducción
+Creditos: 1
+Nota: 5.0
+Periodo: 2024-1
+Calificacion: APROBADA
+========================================
+Estudiante: maria
+Asignatura: 2000001 - Prog. Orientada a Objetos
+Creditos: 3
+Nota: 4.0
+Periodo: 2023-2
+Calificacion: APROBADA
+========================================
+Estudiante: maria
+Asignatura: 2000003 - Física Mecánica
+Creditos: 4
+Nota: 2.9
+Periodo: 2023-2
+Calificacion: REPROBADA
+========================================
+Estudiante: ana
+Asignatura: 4000001 - Estructuras de Datos
+Creditos: 3
+Nota: 4.8
+Periodo: 2024-1
+Calificacion: APROBADA
+========================================
+Estudiante: ana
+Asignatura: 4000005 - Tesis de Grado I
+Creditos: 10
+Nota: 4.9
+Periodo: 2024-2
+Calificacion: APROBADA
+========================================
