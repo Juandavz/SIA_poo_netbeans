@@ -86,7 +86,7 @@ public class DataManager {
 
         try (BufferedReader br = new BufferedReader(new FileReader("catalogo.txt"))) {
             String linea;
-            String cod="", asig="", fac="", cred="", cupos="";
+            String cod="", asig="", fac="", cred="", cupos="", tipo=""; // <--- NUEVO: variable 'tipo'
 
             while ((linea = br.readLine()) != null) {
                 linea = linea.trim();
@@ -95,20 +95,21 @@ public class DataManager {
                 else if (linea.startsWith("Facultad:")) fac = linea.substring(9).trim();
                 else if (linea.startsWith("Creditos:")) cred = linea.substring(9).trim();
                 else if (linea.startsWith("Cupos:")) cupos = linea.substring(6).trim();
+                else if (linea.startsWith("Tipologia:")) tipo = linea.substring(10).trim();
                 else if (linea.startsWith("=====")) {
                     if (!cod.isEmpty()) {
                         // 1. CREAMOS EL OBJETO (POO REAL)
                         int creditosInt = Integer.parseInt(cred);
                         int cuposInt = Integer.parseInt(cupos);
-                        Asignatura nuevaAsignatura = new Asignatura(cod, asig, fac, creditosInt, cuposInt);
+                        Asignatura nuevaAsignatura = new Asignatura(cod, asig, fac, creditosInt, cuposInt, tipo);
                         
                         // 2. LO GUARDAMOS EN MEMORIA
                         listaAsignaturas.add(nuevaAsignatura);
 
                         // 3. PREPARAMOS LA FILA VISUAL PARA LA TABLA
-                        datosParaTabla.add(new Object[]{cod, asig, fac, cred, cupos});
+                        datosParaTabla.add(new Object[]{cod, asig, fac, cred, cupos, tipo});
                     }
-                    cod=""; asig=""; fac=""; cred=""; cupos="";
+                    cod=""; asig=""; fac=""; cred=""; cupos=""; tipo="";
                 }
             }
         } catch (Exception e) { 
