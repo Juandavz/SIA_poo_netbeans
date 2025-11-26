@@ -112,22 +112,17 @@ public class VentanaLogin extends JFrame {
 
         // --- AQUÍ ESTÁ EL CAMBIO ---
         btnEntrar.addActionListener(e -> {
-            String usuario = txtUsuario.getText(); // Capturamos el usuario
-            String clave = new String(txtClave.getPassword()); // Capturamos la clave
+                    // Dentro del ActionListener del botón:
+        String usuario = txtUsuario.getText();
+        String clave = new String(txtClave.getPassword());
 
-            // Condición para admin/admin
-            if (usuario.equals("admin") && clave.equals("admin")) {
-                new VentanaPrincipal(); // Abre la ventana principal
-                dispose(); // Cierra el login
-            } 
-            // Opción extra: dejar la clave 1234 por si acaso (opcional)
-            else if (clave.equals("1234")) {
-                 new VentanaPrincipal();
-                 dispose();
-            }
-            else {
-                JOptionPane.showMessageDialog(this, "Usuario o clave incorrecta", "Error de Acceso", JOptionPane.ERROR_MESSAGE);
-            }
+        // USAR EL NUEVO GESTOR DE DATOS
+        if (DataManager.validarUsuario(usuario, clave)) {
+            new VentanaPrincipal(usuario); // <--- AHORA PASAMOS EL USUARIO
+            dispose();
+        } else {
+            JOptionPane.showMessageDialog(this, "Credenciales incorrectas (Verifique usuarios.csv)");
+        }
         });
     }
 
