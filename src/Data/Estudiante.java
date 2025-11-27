@@ -1,3 +1,5 @@
+package Data;
+
 public class Estudiante {
     private String usuario;
     private String clave;

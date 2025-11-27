@@ -55,3 +55,39 @@ Creditos: 3
 Cupos: 20
 Tipologia: Disciplinar (Obligatoria)
 ========================================
+Codigo: 2016500
+Asignatura: Física de Semiconductores
+Facultad: Ingenieria
+Creditos: 3
+Cupos: 45
+Tipologia: Fundamentacion (Optativa)
+========================================
+Codigo: 2017287
+Asignatura: Sensores y actuadores
+Facultad: Ingenieria
+Creditos: 3
+Cupos: 19
+Tipologia: DISCIPLINAR  (Obligatoria)
+========================================
+Codigo: 2016498
+Asignatura: Electrónica digital I
+Facultad: Ingenieria
+Creditos: 4
+Cupos: 27
+Tipologia: DISCIPLINAR  (Obligatoria)
+========================================
+Codigo: 2017277
+Asignatura: Resistencia de Materiales
+Facultad: Ingenieria
+Creditos: 3
+Cupos: 50
+Tipologia: DISCIPLINAR  (Obligatoria)
+========================================
+Codigo: 2016770
+Asignatura: Robótica 
+Facultad: Ingenieria
+Creditos: 3
+Cupos: 24
+Tipologia: DISCIPLINAR  (Obligatoria)
+========================================
+

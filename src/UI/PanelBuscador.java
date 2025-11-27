@@ -1,3 +1,7 @@
+package UI;
+
+import Data.Asignatura;
+import Data.DataManager;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
@@ -181,24 +185,27 @@ public class PanelBuscador extends JPanel {
     //              ZONA DERECHA (RESULTADOS / INSTRUCCIONES)
     // =======================================================
     private JPanel crearPanelDerecho() {
-        cardLayoutDerecha = new CardLayout();
-        panelDerecho = new JPanel(cardLayoutDerecha);
-        panelDerecho.setBackground(COLOR_FONDO);
-        panelDerecho.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+    cardLayoutDerecha = new CardLayout();
+    panelDerecho = new JPanel(cardLayoutDerecha);
+    panelDerecho.setBackground(COLOR_FONDO);
+    panelDerecho.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
+    ImageIcon icon = new ImageIcon("instruccionesCatalogoAsignatura.png");
+    Image img = icon.getImage();
+    Image imgEscalada = img.getScaledInstance(670, 600, Image.SCALE_SMOOTH);
+    ImageIcon iconEscalado = new ImageIcon(imgEscalada);
+
+    // ⬅️ Aquí va el JLabel que sí es un componente
+    JLabel lblImagen = new JLabel(iconEscalado);
+
+    // Añadir a panelDerecho
+    panelDerecho.add(lblImagen, "instrucciones");
+
+     
         // --- VISTA 1: INSTRUCCIONES ---
         JLabel lblInstrucciones = new JLabel();
         lblInstrucciones.setHorizontalAlignment(SwingConstants.CENTER);
-        try {
-            ImageIcon iconInst = new ImageIcon("instruccionesCatalogoAsignatura.png");
-            // Ajustamos solo si es muy grande
-            if (iconInst.getIconWidth() > 800) {
-                 Image img = iconInst.getImage().getScaledInstance(800, -1, Image.SCALE_SMOOTH);
-                 lblInstrucciones.setIcon(new ImageIcon(img));
-            } else {
-                lblInstrucciones.setIcon(iconInst);
-            }
-        } catch (Exception e) { lblInstrucciones.setText("Instrucciones"); }
+        
         panelDerecho.add(lblInstrucciones, "INSTRUCCIONES");
 
         // --- VISTA 2: TABLA RESULTADOS ---
